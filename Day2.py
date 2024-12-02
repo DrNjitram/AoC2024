@@ -8,8 +8,7 @@ def safety(report):
 
 answer = 0
 answer2 = 0
-for line in read_lines("Inputs/Day2"):
-    report = [int(i) for i in line.split()]
+for report in read_lines("Inputs/Day2", split=True, cast=int):
     safe = safety(report)
     answer += safe
     answer2 += safe
