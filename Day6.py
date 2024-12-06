@@ -1,5 +1,7 @@
+import concurrent.futures
 from multiprocessing import Pool, freeze_support
 from tqdm import tqdm
+import threading
 from util import *
 
 class Route_finder():
@@ -40,14 +42,15 @@ class Route_finder():
             coord = cast_ray(new_data, (guard_p, guard_d))
             if coord is None:
                 return False
-            else:
-                for i in range(int(coord.real) - 1):
-                    guard_p += guard_d
-                    if (guard_p, guard_d) in visited:
-                        return True
-                    visited.add((guard_p, guard_d))
 
-                guard_d *= 1j
+            guard_p += (coord-1) * guard_d
+            if (guard_p, guard_d) in visited:
+
+                return True
+            visited.add((guard_p, guard_d))
+
+            guard_d *= 1j
+
 
 
 def part1_and_2(Lines):
@@ -56,22 +59,26 @@ def part1_and_2(Lines):
     visited = route.run_route()
     answer = len(visited)
 
+    if multiprocess:
+        with Pool() as pool:
+                results = list(
+                    tqdm(
+                        pool.imap_unordered(
+                            route.modify_and_find_loop,
+                            visited
+                        ),
+                    total=len(visited)))
+    else:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            results = list(tqdm(pool.map(route.modify_and_find_loop, visited), total=len(visited)))
 
-    with Pool() as pool:
-            results = list(
-                tqdm(
-                    pool.imap_unordered(
-                        route.modify_and_find_loop,
-                        visited
-                    ),
-                total=len(visited)))
 
-
-    answer2 = sum(results)
+    answer2 = sum(results)-1
     print(answer, answer2)
     return answer, answer2
 
 if __name__ == '__main__':
+    multiprocess = True
     keys = defaultdict(int, {"#": 1, "X": 2})
     test(read_day(6, 1), part1_and_2, (41, 6))
-    part1_and_2(read_day(6, 0))
+    test(read_day(6, 0), part1_and_2, (4967, 1789))

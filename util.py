@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import List, Callable, Any, Tuple
 
+
 direction_dict = {
     -1j: "^",
     1j: "v",
@@ -8,18 +9,22 @@ direction_dict = {
     -1: "<"
 }
 
-def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> complex | None:
+def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> int | None:
     p_pos, p_dir = p
-    coords = [k for k,v in internal_data.items() if v == 1]
+    coords = [k for k,v in internal_data.items() if v == 1 and k.imag == p_pos.imag or k.real == p_pos.real]
     deltas = []
-    valid = [coord for coord in coords if coord.imag == p_pos.imag or coord.real == p_pos.real]
-    for coord in valid:
+
+    if not coords:
+        return None
+
+    for coord in coords:
         delta = (coord-p_pos)/p_dir
         if delta.imag == 0 and delta.real >0:
-            deltas.append(delta.real)
+            deltas.append(int(delta.real))
+
     if len(deltas) > 0:
         return min(deltas)
-    return None
+
 
 
 def read_day(day: int, test: int, **kwargs) -> List[str]:
