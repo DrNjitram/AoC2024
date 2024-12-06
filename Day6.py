@@ -1,83 +1,77 @@
+from multiprocessing import Pool, freeze_support
+from tqdm import tqdm
 from util import *
 
-def run_route(internal_data: dict, guard: Tuple[complex, complex], edit=False) -> set:
-    guard_p, guard_d = guard
-    visited = {guard_p}
-    while True:
-        coord = cast_ray(internal_data, (guard_p, guard_d))
-        if coord is None:
-            while True:
-                guard_p += guard_d
-                if not inbounds_c(internal_data, guard_p):
-                    break
-                visited.add(guard_p)
-                if edit:
-                    internal_data[guard_p] = 2
-            break
-        else:
-            for i in range(int(coord.real)-1):
-                guard_p += guard_d
-                visited.add(guard_p)
-                if edit:
-                    internal_data[guard_p] = 2
-            guard_d *= 1j
-            #print_sparse_map(internal_data, keys, unique=((guard_p, guard_d), None))
+class Route_finder():
+    def __init__(self, data, guard):
+        self.data = data
+        self.guard = guard
 
-        #print_sparse_map(data, keys, unique=((guard_p, guard_d), None))
+    def run_route(self, edit=False) -> set:
+        guard_p, guard_d = self.guard
+        visited = {guard_p}
+        while True:
+            coord = cast_ray(self.data, (guard_p, guard_d))
+            if coord is None:
+                while True:
+                    guard_p += guard_d
+                    if not inbounds_c(self.data, guard_p):
+                        break
+                    visited.add(guard_p)
+                    if edit:
+                        self.data[guard_p] = 2
+                break
+            else:
+                for i in range(int(coord.real) - 1):
+                    guard_p += guard_d
+                    visited.add(guard_p)
+                    if edit:
+                        self.data[guard_p] = 2
+                guard_d *= 1j
 
-    return visited
+        return visited
 
-def find_loop(internal_data: dict, guard: Tuple[complex, complex]) -> bool:
-    guard_p, guard_d = guard
-    visited = {guard}
-    while True:
-        coord = cast_ray(internal_data, (guard_p, guard_d))
-        if coord is None:
-            return False
-        else:
-            for i in range(int(coord.real) - 1):
-                guard_p += guard_d
-                if (guard_p, guard_d) in visited:
-                    return True
-                visited.add((guard_p, guard_d))
+    def modify_and_find_loop(self, modification: complex) -> bool:
+        guard_p, guard_d = self.guard
+        visited = {self.guard}
+        new_data = self.data.copy()
+        new_data[modification] = 1
+        while True:
+            coord = cast_ray(new_data, (guard_p, guard_d))
+            if coord is None:
+                return False
+            else:
+                for i in range(int(coord.real) - 1):
+                    guard_p += guard_d
+                    if (guard_p, guard_d) in visited:
+                        return True
+                    visited.add((guard_p, guard_d))
 
-                #data[guard_p] = 2
-
-            guard_d *= 1j
-
-        #print_sparse_map(data, keys, unique=((guard_p, guard_d), None))
+                guard_d *= 1j
 
 
 def part1_and_2(Lines):
     data, guard = sparse_map(Lines, keys, unique="^", direction=complex(0, -1))
-    visited = run_route(data, guard)
-    print(len(visited))
-    answer = 0
-    for p in visited:
-
-        print(p)
-
-        if p != guard[0]:
-            new_data = data.copy()
-            new_data[p] = 1
-
-            result = find_loop(new_data, guard)
-            answer +=  result
+    route = Route_finder(data, guard)
+    visited = route.run_route()
+    answer = len(visited)
 
 
-    print(answer)
-    return len(visited), answer
-
-def part1(Lines):
-    data, guard = sparse_map(Lines, keys, unique="^", direction=complex(0, -1))
-    #print_sparse_map(data, keys, unique=(guard, "^"))
-
-    visited = run_route(data, guard)
-
-    print(len(visited))
-    return len(visited)
+    with Pool() as pool:
+            results = list(
+                tqdm(
+                    pool.imap_unordered(
+                        route.modify_and_find_loop,
+                        visited
+                    ),
+                total=len(visited)))
 
 
-keys = defaultdict(int, {"#": 1, "X": 2})
-test(read_day(6, 1), part1_and_2, (41, 6))
-part1_and_2(read_day(6, 0))
+    answer2 = sum(results)
+    print(answer, answer2)
+    return answer, answer2
+
+if __name__ == '__main__':
+    keys = defaultdict(int, {"#": 1, "X": 2})
+    test(read_day(6, 1), part1_and_2, (41, 6))
+    part1_and_2(read_day(6, 0))

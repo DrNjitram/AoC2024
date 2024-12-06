@@ -8,8 +8,6 @@ direction_dict = {
     -1: "<"
 }
 
-
-
 def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> complex | None:
     p_pos, p_dir = p
     coords = [k for k,v in internal_data.items() if v == 1]
