@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 from multiprocessing import Pool
 from typing import List, Callable, Any, Tuple, Iterable
@@ -77,7 +78,10 @@ def inbounds(data: [list|dict], x:int, y:int) -> bool:
         return 0 <= x < len(data[0]) and 0 <= y < len(data)
 
 def test(data, fn: Callable, result: Any):
+    start_time = time.perf_counter_ns()
+
     print(fn(data) == result)
+    print(f"Time: {(time.perf_counter_ns() - start_time)/1E6:.2f}ms")
 
 def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direction = None) -> Tuple[dict, None|Tuple[int, int]]:
     result = defaultdict(complex)

@@ -1,32 +1,30 @@
 import itertools
-import numpy as np
-from util import *
+from operator import add, mul
+from util import run_multiprocessing, read_day, test
 
-base_functions = [np.add, np.multiply, lambda a,b:  int(str(a)+str(b))]
-
-def try_combo(num: List[int], fns: List[Callable]) -> int:
-    acc = num[0]
-    for i, fn in enumerate(fns):
-        acc = fn(acc, num[i+1])
-    return acc
+base_functions = [add, mul, lambda a,b:  int(f"{a}{b}")]
 
 def test_equation(args) -> int:
     line, special_fn = args
     test_value, num = line.split(": ")
     test_value = int(test_value)
     num = [int(i) for i in num.split()]
+
     for perm in itertools.product(base_functions[:3 if special_fn else 2], repeat=len(num)-1):
-        if try_combo(num, perm) == test_value:
+        acc = num[0]
+        for i, fn in enumerate(perm):
+            if acc > test_value:
+                break
+            acc = fn(acc, num[i + 1])
+        if acc == test_value:
             return test_value
     return 0
 
 def part1_and2(Lines):
-
     results1 = run_multiprocessing(test_equation, tuple((line, False) for line in  Lines))
     results2 = run_multiprocessing(test_equation, tuple((line, True) for line in  Lines))
 
     print(sum(results1), sum(results2))
-
     return sum(results1), sum(results2)
 
 
