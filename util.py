@@ -1,6 +1,8 @@
 from collections import defaultdict
+from multiprocessing import Pool
 from typing import List, Callable, Any, Tuple
 
+from tqdm import tqdm
 
 direction_dict = {
     -1j: "^",
@@ -27,8 +29,8 @@ def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> i
 
 
 
-def read_day(day: int, test: int, **kwargs) -> List[str]:
-    return read_lines(rf"Inputs\Day{day}" + (f"_Test{test}" if test else ""), *kwargs)
+def read_day(day: int, test_part=0, **kwargs) -> List[str]:
+    return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), *kwargs)
 
 
 def read_lines(filename: str, split=False, cast=None, delim=None) -> List[str]:
@@ -88,3 +90,14 @@ def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direc
             elif c != background:
                 result[complex(x, y)] = keys[c]
     return result, unique_position
+
+def run_multiprocessing(fn: Callable, args: list) -> list:
+    with Pool() as pool:
+        results = list(
+            tqdm(
+                pool.imap_unordered(
+                    fn,
+                    args
+                ),
+                total=len(args)))
+    return results
