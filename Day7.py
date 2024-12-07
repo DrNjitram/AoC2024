@@ -26,8 +26,8 @@ def test_equation(args) -> int:
     return 0
 
 def part1_and2(Lines):
-    results1 = run_multiprocessing(test_equation, list((line, False) for line in  Lines))
-    results2 = run_multiprocessing(test_equation, list((line, True) for line in  Lines))
+    results1 = run_multiprocessing(test_equation, tuple((line, False) for line in  Lines))
+    results2 = run_multiprocessing(test_equation, tuple((line, True) for line in  Lines))
 
     print(sum(results1), sum(results2))
 

@@ -1,6 +1,6 @@
 from collections import defaultdict
 from multiprocessing import Pool
-from typing import List, Callable, Any, Tuple
+from typing import List, Callable, Any, Tuple, Iterable
 
 from tqdm import tqdm
 
@@ -91,7 +91,7 @@ def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direc
                 result[complex(x, y)] = keys[c]
     return result, unique_position
 
-def run_multiprocessing(fn: Callable, args: list) -> list:
+def run_multiprocessing(fn: Callable, args: Iterable) -> list:
     with Pool() as pool:
         results = list(
             tqdm(
