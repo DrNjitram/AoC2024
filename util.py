@@ -35,7 +35,7 @@ def read_day(day: int, test_part=0, **kwargs) -> List[str]:
 
 
 def read_lines(filename: str, split=False, cast=None, delim=None) -> List[str]:
-    lines = [line.strip() for line in open(filename).readlines()]
+    lines = [line.strip() for line in open(filename).readlines() if line.strip() != ""]
     if split and cast:
         lines = [[cast(i) for i in line.split(sep=delim)] for line in lines]
     elif split:
@@ -49,21 +49,35 @@ def print_map(data: List[str]):
         print(line)
     print("")
 
-def print_sparse_map(data: dict[complex, Any], keys: dict, unique=None, background = ".") -> None:
-    x_s, y_s = zip(*[(int(p.real), int(p.imag)) for p in data.keys()])
-    print_keys = {v: k for k, v in keys.items()}
+def print_sparse_map(data: dict[Any, Any], keys=None, unique=None, background = ".") -> None:
+    complex_map = False
+    if type([type(k) for k in data.keys()][0]) == complex:
+        complex_map = True
+        x_s, y_s = zip(*[(int(p.real), int(p.imag)) for p in data.keys()])
+    else:
+        x_s, y_s = zip(*[p for p in data.keys()])
+    if keys is not None:
+        print_keys = {v: k for k, v in keys.items()}
+    else:
+        print_keys = {v: v for k, v in data.items()}
+    pos_p = None
+
     if unique is not None:
         (pos_p, pos_d), icon = unique
     for y in range(min(y_s), max(y_s) + 1):
         line = ""
         for x in range(min(x_s), max(x_s) + 1):
-            if unique is not None and complex(x,y) == pos_p:
-                if pos_d != None:
+            if complex_map:
+                pos = complex(x,y)
+            else:
+                pos = (x,y)
+            if unique is not None and pos == pos_p:
+                if pos_d is not None:
                     line += direction_dict[pos_d]
                 else:
                     line += icon
             else:
-                line += print_keys.get(data[complex(x,y)], background)
+                line += print_keys.get(data[pos], background)
         print(line)
     print("")
 
