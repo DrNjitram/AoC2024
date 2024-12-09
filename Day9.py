@@ -68,11 +68,8 @@ def fix_disk2(Line):
 
     return file_index, moved_files, unmovable_files
 
-def sum_range(n):
-    return n * (n + 1) // 2
-
 def get_sum_range(a,b):
-    return sum_range(b-1)-sum_range(a-1)
+    return ((b-a)*((b+a)+1))//2
 
 def get_score(data):
     answer = 0
@@ -80,7 +77,7 @@ def get_score(data):
         if file_length == 1:
             answer += file_id * file_pos
         else:
-            answer += get_sum_range(file_pos, file_pos + file_length) * file_id
+            answer += get_sum_range(file_pos-1, file_pos + file_length-1) * file_id
     return answer
 
 def part1(Lines):
