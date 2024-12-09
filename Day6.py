@@ -69,7 +69,7 @@ def part1_and_2(Lines):
                         ),
                     total=len(visited)))
     else:
-        with concurrent.futures.ThreadPoolExecutor() as pool:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
             results = list(tqdm(pool.map(route.modify_and_find_loop, visited), total=len(visited)))
 
 
