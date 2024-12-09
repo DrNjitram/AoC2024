@@ -2,23 +2,18 @@ from util import *
 
 def parse_disk(Line):
     disk_map = [int(i) for i in Line]
-    i = 0
     file = True
     empty_index = []
     file_index = []
-    moved_files = []
     disk_len = 0
-    file_id = 0
-    while i < len(disk_map):
+    for i in range(len(disk_map)):
         if file:
-            file_index.append((disk_len, disk_map[i], file_id))
-            file_id += 1
+            file_index.append((disk_len, disk_map[i], i//2))
             file = False
         else:
             empty_index.append((disk_len, disk_map[i]))
             file = True
         disk_len += disk_map[i]
-        i += 1
     return file_index, empty_index
 
 def fix_disk(Line):
@@ -72,13 +67,7 @@ def get_sum_range(a,b):
     return ((b-a)*((b+a)+1))//2
 
 def get_score(data):
-    answer = 0
-    for file_pos, file_length, file_id in data:
-        if file_length == 1:
-            answer += file_id * file_pos
-        else:
-            answer += get_sum_range(file_pos-1, file_pos + file_length-1) * file_id
-    return answer
+    return sum(get_sum_range(file_pos-1, file_pos + file_length-1) * file_id for file_pos, file_length, file_id in data)
 
 def part1(Lines):
     file_index, moved_files = fix_disk(Lines[0])
@@ -98,7 +87,7 @@ def part2(Lines):
 if __name__ == "__main__":
     test(read_day(9, 2), part1, 60)
     test(read_day(9, 1), part1, 1928)
-    test(read_day(9), part1, 6279058075753)
     test(read_day(9, 1), part2, 2858)
+    test(read_day(9), part1, 6279058075753)
     test(read_day(9), part2, 6301361958738)
 
