@@ -31,7 +31,7 @@ def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> i
 
 
 def read_day(day: int, test_part=0, **kwargs) -> List[str]:
-    return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), *kwargs)
+    return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), **kwargs)
 
 
 def read_lines(filename: str, split=False, cast=None, delim=None) -> List[str]:

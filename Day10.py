@@ -39,12 +39,11 @@ def part1(Lines):
 
     #nx.draw(G, with_labels=True, font_weight='bold', labels=labeldict)
     #plt.show()
-    print(answer)
-    print(answer + answer2)
+    print(answer, answer + answer2)
     return answer, answer2+answer
 
 
 if __name__ == '__main__':
-    test(read_day(10, 1), part1, 1)
+    test(read_day(10, 1), part1, (1, 16))
     test(read_day(10, 2), part1, (36, 81))
-    part1(read_day(10))
+    test(read_day(10), part1, (719, 1530))
