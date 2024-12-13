@@ -1,8 +1,10 @@
+import re
 import time
 from collections import defaultdict
 from multiprocessing import Pool
 from typing import List, Callable, Any, Tuple, Iterable
 
+import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
@@ -53,20 +55,27 @@ def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> i
     if len(deltas) > 0:
         return min(deltas)
 
-
+def is_int(x):
+    return np.mod(x+0.0001, 1) < 0.001
 
 def read_day(day: int, test_part=0, **kwargs) -> List[str]:
     return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), **kwargs)
 
 
-def read_lines(filename: str, split=False, cast=None, delim=None) -> List[str]:
+def read_lines(filename: str, split=False, cast=None, delim=None, regex=None) -> List[str]:
     lines = [line.strip() for line in open(filename).readlines() if line.strip() != ""]
     if split and cast:
         lines = [[cast(i) for i in line.split(sep=delim)] for line in lines]
     elif split:
         lines = [line.split(sep=delim) for line in lines]
+    elif regex:
+        if cast:
+            lines = [[cast(i) for i in re.findall(regex, line)] for line in lines]
+        else:
+            lines = [re.findall(regex, line) for line in lines]
     elif cast:
         lines = [cast(line) for line in lines]
+
     return lines
 
 def print_map(data: List[str]):
