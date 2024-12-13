@@ -3,6 +3,7 @@ from collections import defaultdict
 from multiprocessing import Pool
 from typing import List, Callable, Any, Tuple, Iterable
 
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 direction_dict = {
@@ -11,6 +12,30 @@ direction_dict = {
     1: ">",
     -1: "<"
 }
+
+adj4 = [
+    [-1, 0],
+    [1, 0],
+    [0, 1],
+    [0, -1]
+]
+adj8 = [
+    [-1, 0],
+    [1, 0],
+    [0, 1],
+    [0, -1],
+    [-1, -1],
+    [1, 1],
+    [-1, 1],
+    [1, -1]
+]
+
+def print_garden(edges, plot):
+    xy, uv = zip(*edges)
+    plt.scatter(*zip(*plot))
+    plt.quiver(*zip(*xy), *zip(*uv), scale_units="xy", scale=1)
+    plt.title(f"{len(edges)}, {len(plot)},{len(plot) * len(edges)}")
+    plt.show()
 
 def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> int | None:
     p_pos, p_dir = p
