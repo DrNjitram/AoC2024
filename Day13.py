@@ -1,3 +1,6 @@
+import numpy as np
+
+from heavy_util import is_int
 from util import *
 
 def get_coin(AB, prize):

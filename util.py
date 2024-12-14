@@ -3,9 +3,6 @@ import time
 from collections import defaultdict
 from multiprocessing import Pool
 from typing import List, Callable, Any, Tuple, Iterable
-
-import numpy as np
-from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 direction_dict = {
@@ -32,12 +29,6 @@ adj8 = [
     [1, -1]
 ]
 
-def print_garden(edges, plot):
-    xy, uv = zip(*edges)
-    plt.scatter(*zip(*plot))
-    plt.quiver(*zip(*xy), *zip(*uv), scale_units="xy", scale=1)
-    plt.title(f"{len(edges)}, {len(plot)},{len(plot) * len(edges)}")
-    plt.show()
 
 def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> int | None:
     p_pos, p_dir = p
@@ -55,8 +46,7 @@ def cast_ray(internal_data: dict[complex, int], p: tuple[complex, complex]) -> i
     if len(deltas) > 0:
         return min(deltas)
 
-def is_int(x):
-    return np.mod(x+0.0001, 1) < 0.001
+
 
 def read_day(day: int, test_part=0, **kwargs) -> List[str]:
     return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), **kwargs)
