@@ -12,6 +12,24 @@ direction_dict = {
     -1: "<"
 }
 
+inv_direction_dict = {
+    "^": -1j,
+    "v": 1j,
+    ">":1,
+    "<": -1
+}
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 adj4 = [
     [-1, 0],
     [1, 0],
@@ -52,8 +70,8 @@ def read_day(day: int, test_part=0, **kwargs) -> List[str]:
     return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), **kwargs)
 
 
-def read_lines(filename: str, split=False, cast=None, delim=None, regex=None) -> List[str]:
-    lines = [line.strip() for line in open(filename).readlines() if line.strip() != ""]
+def read_lines(filename: str, split=False, cast=None, delim=None, regex=None) -> List[str|list|int]:
+    lines = [line.strip() for line in open(filename).read().strip().split("\n")]
     if split and cast:
         lines = [[cast(i) for i in line.split(sep=delim)] for line in lines]
     elif split:
@@ -75,7 +93,7 @@ def print_map(data: List[str]):
 
 def print_sparse_map(data: dict[Any, Any], keys=None, unique=None, background = ".") -> None:
     complex_map = False
-    if type([type(k) for k in data.keys()][0]) == complex:
+    if [type(k) for k in data.keys()][0] == complex:
         complex_map = True
         x_s, y_s = zip(*[(int(p.real), int(p.imag)) for p in data.keys()])
     else:
@@ -87,7 +105,12 @@ def print_sparse_map(data: dict[Any, Any], keys=None, unique=None, background = 
     pos_p = None
 
     if unique is not None:
-        (pos_p, pos_d), icon = unique
+        p, icon = unique
+        if type(p) == complex:
+            pos_p = p
+            pos_d = None
+        else:
+            pos_p, pos_d = p
     for y in range(min(y_s), max(y_s) + 1):
         line = ""
         for x in range(min(x_s), max(x_s) + 1):
@@ -115,20 +138,29 @@ def inbounds(data: [list|dict], x:int, y:int) -> bool:
     else:
         return 0 <= x < len(data[0]) and 0 <= y < len(data)
 
-def test(data, fn: Callable, result: Any):
+def test(data, fn: Callable, result: Any, **kwargs):
     start_time = time.perf_counter_ns()
 
-    print(fn(data) == result)
-    print(f"Time: {(time.perf_counter_ns() - start_time)/1E6:.2f}ms")
+    try:
+        t = fn(data, **kwargs)
+        if t == result:
+            print(f"{Colors.OKCYAN}SUCCESS Time: {(time.perf_counter_ns() - start_time)/1E6:.2f}ms{Colors.ENDC}")
+        else:
+            print(f"{Colors.FAIL}FAILURE Time: {(time.perf_counter_ns() - start_time) / 1E6:.2f}ms{Colors.ENDC}")
+    except Exception as e:
+        raise e
 
-def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direction = None) -> Tuple[dict, None|Tuple[int, int]]:
+def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direction = None) -> Tuple[dict, None|Tuple[complex, complex]|complex]:
     result = defaultdict(complex)
     unique_position = None
     for y in range(len(data)):
         for x in range(len(data[y])):
             c = data[y][x]
             if c == unique:
-                unique_position = (complex(x, y), direction)
+                if direction is None:
+                    unique_position = complex(x, y)
+                else:
+                    unique_position = [complex(x, y), direction]
             elif c != background:
                 result[complex(x, y)] = keys[c]
     return result, unique_position
