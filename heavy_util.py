@@ -1,6 +1,11 @@
+import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
 
+def draw_path(G, path, pos=None):
+    nx.draw(G, pos=pos)
+    nx.draw_networkx_edges(G, pos, edgelist=list(zip(path, path[1:])), edge_color='r', width=5)
+    plt.show()
 
 def is_int(x):
     return np.mod(x+0.0001, 1) < 0.001
