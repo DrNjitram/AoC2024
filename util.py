@@ -144,12 +144,17 @@ def flatten_linearly_nested(lst):
         return [a, b]
     flat_list = [a]
     while True:
-        a, b = b
-        flat_list.append(a)
+        if len(b) == 1:
+            flat_list += b
+            break
+        else:
+            a, b = b
+            flat_list.append(a)
         if type(b) == int:
             flat_list += [b]
             break
     return flat_list
+
 def test(data, fn: Callable, result: Any, **kwargs):
     start_time = time.perf_counter_ns()
 

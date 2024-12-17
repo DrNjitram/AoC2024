@@ -110,60 +110,31 @@ def part1(Lines):
     print(answer)
     return answer
 
-def find_correct_A(base, prog) -> list:
+def find_correct_A(base, prog):
     if not prog:
-        return [base]
+        return [base] # bingo
     options = reverse_test(base, prog[0])
-    poss = []
     if not options:
-        return [base]
+        return [False] # dead end
+    poss = []
     for option in options:
-        poss.append([base]+find_correct_A(option, prog[1:]))
-    return poss
-
-def get_nested(inp):
-    if type(inp) == int:
-        return [[inp]]
-    ret = []
-    if type(inp[1]) == list:
-        base = inp.pop(0)
-        for b in inp:
-            for r in get_nested(b):
-                ret.append([base]+[r])
-        return ret
-    else:
-        return inp
+        res = [r for r in find_correct_A(option, prog[1:]) if r]
+        poss += res
+    return poss # collect results
 
 
 def part2(Lines):
     inputs = init_computer(Lines)
     program = inputs[3][::-1]
 
-    reverse_A = find_correct_A(program[0], program[0:])
+    reverse_A = find_correct_A(program[0], program)
 
-    correct = []
-    for sol in reverse_A:
-        for lst in get_nested(sol):
-            flat_list = flatten_linearly_nested(lst)
-            if len(flat_list) == len(program):
-                correct.append(flat_list[-1])
-
-    # for some reason it sometimes misses a strep, so we filter out the wrong ones
-    really_correct = []
-    for inp in correct:
-        computer = Computer(*inputs)
-        computer.A = inp
-        out = list(map(int, computer.run()))
-        if out == computer.program:
-            really_correct.append(inp)
-
-
-    print(min(really_correct))
-    return min(really_correct)
+    print(min(reverse_A))
+    return min(reverse_A)
 
 
 if __name__ == '__main__':
-    test(read_day(17, 1, regex=r'\d+', cast=int), part1, "4,6,3,5,6,3,5,2,1,0")
-    test(read_day(17, regex=r'\d+', cast=int), part1, "2,0,4,2,7,0,1,0,3")
+    #test(read_day(17, 1, regex=r'\d+', cast=int), part1, "4,6,3,5,6,3,5,2,1,0")
+    #test(read_day(17, regex=r'\d+', cast=int), part1, "2,0,4,2,7,0,1,0,3")
     #test(read_day(17, 2, regex=r'\d+', cast=int), part2, 117440)
     test(read_day(17, regex=r'\d+', cast=int), part2, 265601188299675)
