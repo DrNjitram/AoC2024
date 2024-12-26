@@ -182,6 +182,21 @@ def sparse_map(data: List[str], keys: dict, background = ".", unique=None, direc
                 result[complex(x, y)] = keys[c]
     return result, unique_position
 
+def get_adjecent(x,y, data, adj, values=False, ignore=None):
+    if values:
+        if type(data) == dict:
+            neigh = [data[(x+dx,y+dy)] for dx, dy in adj ]
+        else:
+            neigh = [data[y+dy][x+dx] if inbounds(data, x+dx, y+dy) else None for dx, dy in adj]
+    else:
+        if type(data) == dict:
+            neigh = [(x + dx, y + dy) for dx, dy in adj]
+        else:
+            neigh = [(x + dx, y + dy) if inbounds(data, x+dx, y+dy) else None for dx, dy in adj]
+    if ignore:
+        rep, check = ignore
+        neigh = [n if n not in check else rep for n in neigh]
+    return neigh
 def run_multiprocessing(fn: Callable, args: Iterable) -> list:
     with Pool() as pool:
         results = list(
@@ -192,3 +207,8 @@ def run_multiprocessing(fn: Callable, args: Iterable) -> list:
                 ),
                 total=len(args)))
     return results
+
+def d_euclid(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return abs(x1 - x2) + abs(y1 - y2)
