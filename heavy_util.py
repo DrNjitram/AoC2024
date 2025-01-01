@@ -1,3 +1,5 @@
+import math
+
 import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
@@ -16,3 +18,4 @@ def print_garden(edges, plot):
     plt.quiver(*zip(*xy), *zip(*uv), scale_units="xy", scale=1)
     plt.title(f"{len(edges)}, {len(plot)},{len(plot) * len(edges)}")
     plt.show()
+

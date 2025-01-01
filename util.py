@@ -1,3 +1,4 @@
+import math
 import re
 import time
 from collections import defaultdict
@@ -70,11 +71,11 @@ def read_day(day: int, test_part=0, **kwargs) -> List[str]:
     return read_lines(rf"Inputs\Day{day}" + (f"_Test{test_part}" if test_part else ""), **kwargs)
 
 
-def read_lines(filename: str, split=False, cast=None, delim=None, regex=None) -> List[str|list|int]:
+def read_lines(filename: str, cast=None, delim=None, regex=None) -> List[str|list|int]:
     lines = [line.strip() for line in open(filename).read().strip().split("\n")]
-    if split and cast:
+    if delim and cast:
         lines = [[cast(i) for i in line.split(sep=delim)] for line in lines]
-    elif split:
+    elif delim:
         lines = [line.split(sep=delim) for line in lines]
     elif regex:
         if cast:
@@ -213,3 +214,6 @@ def d_euclid(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
     return abs(x1 - x2) + abs(y1 - y2)
+
+def n_combinations(marbles: int, bag: int)-> int:
+    return math.factorial(bag)//(math.factorial(marbles) * math.factorial(bag-marbles))
