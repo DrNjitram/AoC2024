@@ -197,6 +197,7 @@ def get_adjecent(x,y, data, adj, values=False, ignore=None):
         rep, check = ignore
         neigh = [n if n not in check else rep for n in neigh]
     return neigh
+
 def run_multiprocessing(fn: Callable, args: Iterable) -> list:
     with Pool() as pool:
         results = list(
