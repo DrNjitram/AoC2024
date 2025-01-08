@@ -4,12 +4,9 @@ import networkx as nx
 def part1_and_2(Lines):
     G = nx.Graph()
     S = E = None
-    pos = {}
     for y in range(1, len(Lines)-1):
         for x in range(1, len(Lines[y])-1):
             if Lines[y][x] != '#':
-                pos[(x,y,0)] = (x,-y)
-                pos[(x,y,1)] = (x,-y)
                 if Lines[y][x] == 'S':
                     S = (x,y, 0)
                     G.add_edge((x, y, 0), (x, y, 1), weight=1000)
@@ -29,7 +26,7 @@ def part1_and_2(Lines):
                     G.add_edge((x,y,0), (x,y,1), weight=1000)
     path = nx.shortest_path(G, S, E, weight='weight')
     weight = nx.path_weight(G, path, weight='weight')
-
+    #draw_path(G, path, pos={p:(p[0], p[1]) for p in G.nodes}, node_size=2)
     seats = set()
     for path in nx.all_shortest_paths(G, S, E, weight='weight'):
             seats |= set([(p[0], p[1]) for p in path])
